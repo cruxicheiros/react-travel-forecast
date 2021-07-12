@@ -1,6 +1,5 @@
 import Card from "./Card";
 import React from "react";
-import ResultTransformer from "../api/ResultTransformer";
 
 /**
  * A list of weather cards
