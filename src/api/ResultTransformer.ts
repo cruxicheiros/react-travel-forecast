@@ -7,12 +7,12 @@ import Forecast from "../weather/Forecast";
 class ResultTransformer {
     constructor() {};
 
-    transform(apiResult: any, hour: number) {
-        let hourlyResult = apiResult.forecast.forecastday[0]["hour"][hour];
+    transform(apiResult: any, time: Date) {
+        let hourlyResult = apiResult.forecast.forecastday[0]["hour"][time.getHours()];
 
         return new Forecast(
             apiResult.location.name,
-            new Date(hourlyResult.time),
+            time,
             hourlyResult.condition.text,
             hourlyResult.temp_c
         );

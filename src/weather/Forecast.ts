@@ -15,7 +15,7 @@ class Forecast {
     }
 
     getTimeFormatted() {
-        return this.dateTime.toTimeString();
+        return this.dateTime.getHours().toString().padStart(2, '0') + ":" + this.dateTime.getMinutes().toString().padStart(2, '0');
     }
 
     getDateFormatted() {

@@ -1,21 +1,14 @@
 import logo from './logo.svg';
 import './App.css';
-import CardList from './cards/CardList';
 import ForecastQuery from './weather/ForecastQuery';
+import CardContainer from './cards/CardContainer';
 
 function App() {
-  let forecastQueries = [
-    new ForecastQuery("London", 12),
-    new ForecastQuery("Nottingham", 16)
-  ]
-
   return (
     <div className="App">
       <header className="App-header">
         <h1>Travel Forecast</h1>
-
-        <CardList forecastQueries={forecastQueries}/>
-
+        <CardContainer></CardContainer>
       </header>
     </div>
   );

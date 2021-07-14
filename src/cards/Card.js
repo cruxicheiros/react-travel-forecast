@@ -1,5 +1,6 @@
 import React from "react";
 import ResultTransformer from "../api/ResultTransformer";
+import ForecastQuery from "../weather/ForecastQuery";
 
 /**
  * A card that displays weather data for a time and location
@@ -11,15 +12,31 @@ class Card extends React.Component {
         this.state = {
             error: null,
             isLoaded: false,
-            isEditing: false,
+            isEditing: props.isEditing || false,
             forecastQuery: props.forecastQuery,
-            forecast: null
+            forecast: null,
+            removalCallback : props.removalCallback,
+            editCallback: props.editCallback
         };
 
         this.switchModes = this.switchModes.bind(this);
     }
     
     componentDidMount() {
+        this.updateWithFreshApiCall();
+    }
+
+    
+    componentDidUpdate(prevProps) {
+        if (prevProps.forecastQuery.place != this.props.forecastQuery.place || prevProps.forecastQuery.time != this.props.forecastQuery.time) {
+            console.log(prevProps.forecastQuery.place, "=>", this.props.forecastQuery.place)
+            this.setState({forecastQuery: this.props.forecastQuery}, this.updateWithFreshApiCall)
+        }
+    }
+
+    updateWithFreshApiCall() {
+        console.log(this.state.forecastQuery)
+
         fetch("http://api.weatherapi.com/v1/forecast.json?key=" + process.env.REACT_APP_WEATHER_API_KEY + "&q=" + this.state.forecastQuery.place + "&aqi=no")
         .then(res => res.json())
         .then(
@@ -28,7 +45,7 @@ class Card extends React.Component {
                 
                 let resultTransformer = new ResultTransformer;
                 
-                let forecast = resultTransformer.transform(result, this.state.forecastQuery.hour)
+                let forecast = resultTransformer.transform(result, this.state.forecastQuery.time)
                     
                 this.setState({
                     isLoaded: true,
@@ -45,8 +62,22 @@ class Card extends React.Component {
         )
     }
 
-    handleSubmit() {
-        alert("submitted")
+    handleSubmit(event) {
+        event.preventDefault();
+        
+        let newPlace = event.target.elements[0].value;
+        let hoursMinutes = event.target.elements[1].value.split(":");
+        let newTime = new Date();
+        newTime.setHours(hoursMinutes[0]);
+        newTime.setMinutes(hoursMinutes[1]);
+
+        let newForecastQuery = new ForecastQuery(newPlace, newTime, this.state.forecastQuery.uniqueId);
+
+        this.setState({"forecastQuery": newForecastQuery}, this.updateWithFreshApiCall);
+        this.updateWithFreshApiCall();
+        this.state.editCallback(newForecastQuery);
+
+        this.switchModes()
     }
 
     switchModes() {
@@ -57,8 +88,6 @@ class Card extends React.Component {
     render() {
         const { error, isLoaded, isEditing, forecastQuery, forecast} = this.state;
 
-        console.log(isEditing);
-
         if (error) {
             return <div class="card">Error: {error.message}</div>;
         } else if (!isLoaded) {
@@ -66,15 +95,15 @@ class Card extends React.Component {
         } else if (isEditing) {
             return (
                 <div class="card">
-                    <form onSubmit={this.switchModes}>
+                    <form onSubmit={(event) => {this.handleSubmit(event)}}>
                         <p>
-                            <label htmlFor="place-input">Place name:</label>
-                            <input type="text" label="place-input" defaultValue={forecastQuery.place}></input>
+                            <label htmlFor="place_input">Place name:</label>
+                            <input type="text" label="place_input" defaultValue={forecast.place}></input>
                         </p>
 
                         <p>
-                            <label htmlFor="time-input">Hour of the day (0-23):</label>
-                            <input type="number" label="time-input" defaultValue={forecastQuery.hour}></input>
+                            <label htmlFor="time_input">Time of day:</label>
+                            <input type="time" label="time_input" defaultValue={forecast.getTimeFormatted()}></input>
                         </p>
 
                         <input type="submit" value="Save"/>
@@ -90,12 +119,13 @@ class Card extends React.Component {
                     </p>
                     
                     <p>
-                        <date>{forecast.getDateFormatted()}</date>
+                        <time>{forecast.getDateFormatted()}</time>
                     </p>
                     
                     <p class="weather">{forecast.condition}</p>
 
                     <button onClick={this.switchModes}>Edit</button>
+                    <button onClick={(event) => {this.state.removalCallback(event, this.state.forecastQuery.uniqueId)}}>Remove</button>
                 </div>
             )
         }
