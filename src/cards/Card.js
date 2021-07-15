@@ -74,7 +74,6 @@ class Card extends React.Component {
         let newForecastQuery = new ForecastQuery(newPlace, newTime, this.state.forecastQuery.uniqueId);
 
         this.setState({"forecastQuery": newForecastQuery}, this.updateWithFreshApiCall);
-        this.updateWithFreshApiCall();
         this.state.editCallback(newForecastQuery);
 
         this.switchModes()

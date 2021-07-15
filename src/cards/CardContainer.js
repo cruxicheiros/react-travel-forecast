@@ -3,6 +3,7 @@ import React from "react";
 import CardList from "./CardList";
 import NewCardForm from "./NewCardForm";
 import ForecastQuery from "../weather/ForecastQuery";
+import ForecastUrlMaker from "./ForecastUrlMaker";
 
 /**
  * A list of weather cards
@@ -14,9 +15,21 @@ class CardContainer extends React.Component {
       this.state = {
           error: null,
           isLoaded: false,
-          forecastQueries: []
+          forecastQueries: this.getForecastQueriesFromURL()
       }
+    }
 
+    getForecastQueriesFromURL() {
+      const params = new URLSearchParams(window.location.search);
+      let urlForecastQueries = [];
+
+      params.forEach((value, key) => {
+        urlForecastQueries.push(
+          new ForecastQuery(key, new Date(value))
+          )
+        });
+
+      return urlForecastQueries;
     }
   
     componentDidMount() {
@@ -27,7 +40,7 @@ class CardContainer extends React.Component {
         event.preventDefault();
         
         let newPlace = event.target.elements[0].value;
-        
+
         let hoursMinutes = event.target.elements[1].value.split(":");
         let newTime = new Date();
         newTime.setHours(hoursMinutes[0]);
@@ -63,6 +76,7 @@ class CardContainer extends React.Component {
       } else {
         return (
             <div class="card-container">
+                <ForecastUrlMaker forecastQueries={this.state.forecastQueries}></ForecastUrlMaker>
                 <NewCardForm submitCallback={this.newCardCallback.bind(this)}></NewCardForm>
                 <CardList forecastQueries={this.state.forecastQueries} editCallback={this.editCardCallback.bind(this)} removalCallback={this.removeCardCallback.bind(this)}/>
             </div>
