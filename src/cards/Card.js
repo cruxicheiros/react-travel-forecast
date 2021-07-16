@@ -112,16 +112,55 @@ class Card extends React.Component {
         } else {
             return (
                 <div class="card">
-                    <h2>{forecast.place}</h2>
-                    <p>
-                        <time>{forecast.getTimeFormatted()}</time>
-                    </p>
+                    <div class="card-heading">
+                        <div class="card-heading-place-info">
+                            <h2>{forecast.place}</h2>
+                            <h3>{forecast.country}</h3>
+                            <time>{forecast.getTimeFormatted()}</time>
+                            <time>{forecast.getDateFormatted()}</time>
+                        </div>
+
+                        <div>
+                            <img src={forecast.iconUrl} alt={forecast.condition}></img>
+                            <p class="weather">{forecast.condition}</p>
+                        </div>
+                    </div>
                     
-                    <p>
-                        <time>{forecast.getDateFormatted()}</time>
-                    </p>
-                    
-                    <p class="weather">{forecast.condition}</p>
+                    <div class="card-body">
+                        <div class="temperature">
+                            <p class="temperature-display">{forecast.getTempFormattedCelsius()}</p>
+                            <p class="feels-like-display">Feels like {forecast.getFeelsLikeFormattedCelsius()}</p>
+                        </div>
+
+                        <table class="weather-info">
+                            <tr>
+                                <th>
+                                    Precipitation
+                                </th>
+                                <td>
+                                    {forecast.getPrecipitationFormattedMm()}
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <th>
+                                    Humidity
+                                </th>
+                                <td>
+                                    {forecast.getHumidityFormatted()}
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <th>
+                                    Wind speed
+                                </th>
+                                <td>
+                                    {forecast.getWindSpeedFormattedKph()}
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
 
                     <button onClick={this.switchModes}>Edit</button>
                     <button onClick={(event) => {this.state.removalCallback(event, this.state.forecastQuery.uniqueId)}}>Remove</button>

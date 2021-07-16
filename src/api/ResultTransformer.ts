@@ -12,9 +12,20 @@ class ResultTransformer {
 
         return new Forecast(
             apiResult.location.name,
+            apiResult.location.country,
             time,
             hourlyResult.condition.text,
-            hourlyResult.temp_c
+            hourlyResult.condition.icon,
+            hourlyResult.temp_c,
+            hourlyResult.temp_f,
+            hourlyResult.feelslike_c,
+            hourlyResult.feelslike_f,
+            hourlyResult.wind_kph,
+            hourlyResult.wind_mph,
+            hourlyResult.precip_mm,
+            hourlyResult.precip_in,
+            hourlyResult.humidity,
+            hourlyResult.code
         );
     }
 }
